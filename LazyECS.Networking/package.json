@@ -1,0 +1,20 @@
+﻿{
+  "name": "com.kinematic.games.lazyecs.networking",
+  "version": "1.0.0",
+  "displayName": "Lazy ECS Networking",
+  "description": "This is a networking addon for LazyECS",
+  "unity": "2017.1",
+  "unityRelease": "0b5",
+  "dependencies": {
+  	"com.kinematic.games.lazyecs": "1.0.0"
+  },
+  "keywords": [
+    "ecs",
+    "networking"
+  ],
+  "author": {
+    "name": "Tate McCormick",
+    "email": "tate@kinematic.games",
+    "url": "https://kinematic.games"
+  }
+}
