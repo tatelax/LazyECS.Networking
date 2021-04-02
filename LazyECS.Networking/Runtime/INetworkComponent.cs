@@ -1,7 +1,7 @@
 ﻿using LazyECS.Component;
 using Mirror;
 
-public interface INetworkComponent : IComponent, NetworkMessage
+public interface INetworkComponent : IComponent
 {
 	void SendMessage();
 }

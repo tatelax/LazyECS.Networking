@@ -1,6 +1,9 @@
 {
     "name": "Unity.LazyECS.Networking",
-    "references": [],
+    "references": [
+        "GUID:f829098a39adf5641a5db89608bd75ee",
+        "GUID:30817c1a0e6d646d99c048fc403f5979"
+    ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
