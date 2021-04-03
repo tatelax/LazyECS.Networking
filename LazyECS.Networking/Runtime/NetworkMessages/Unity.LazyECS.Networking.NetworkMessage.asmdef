@@ -1,9 +1,7 @@
 {
-    "name": "Unity.LazyECS.Networking",
+    "name": "Unity.LazyECS.Networking.NetworkMessage",
     "references": [
-        "GUID:f829098a39adf5641a5db89608bd75ee",
-        "GUID:30817c1a0e6d646d99c048fc403f5979",
-        "GUID:f57c04d3ae1b3294e89f92560450536d"
+        "GUID:30817c1a0e6d646d99c048fc403f5979"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
