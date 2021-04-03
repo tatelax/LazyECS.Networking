@@ -1,5 +1,5 @@
 # LazyECS.Networking
- Networking addon for LazyECS
+This is a networking addon for LazyECS. It uses Mirror behind the scenes to automatically synchronize entity changes from Server to Client (vice versa not available yet). You can pick which components get synchronized on a given entity. All entities in a NetworkWorld are synchronized across the network.
 
 # Example Project
 
