@@ -11,10 +11,10 @@ public class NetworkWorld : World
 	{
 		base.Init();
 		NetworkClient.RegisterHandler<CreateEntityMessage>(CreateEntityMessageReceived);
-		NetworkClient.RegisterHandler<ComponentAddedMessage>(ComponentAddedMessageRecieved);
 		NetworkClient.RegisterHandler<DestroyEntityMessage>(DestroyEntityMessageReceived);
+		NetworkClient.RegisterHandler<ComponentAddedMessage>(ComponentAddedMessageRecieved);
+		NetworkClient.RegisterHandler<ComponentRemovedMessage>(ComponentRemovedMessageRecieved);
 	}
-
 
 
 	/*
@@ -44,6 +44,21 @@ public class NetworkWorld : World
 			Debug.Log($"cool {msg.entityId} {msg.componentId}");
 			entity.Add(msg.componentId);
 		}
+	}
+	
+	private void ComponentRemovedMessageRecieved(NetworkConnection conn, ComponentRemovedMessage msg)
+	{
+		if (conn.connectionId == 0 && NetworkServer.active) // Check if we are the host
+			return;
+		
+		if (!Entities.ContainsKey(msg.entityId))
+		{
+			Debug.LogError("Tried to remove a component to from entity that didnt exist!");
+			return;
+		}
+		
+		Entity entity = Entities[msg.entityId];
+		entity.Remove(msg.componentId);
 	}
 
 	private void CreateEntityMessageReceived(NetworkConnection conn, CreateEntityMessage msg)
@@ -96,11 +111,12 @@ public class NetworkWorld : World
 		base.OnComponentAddedToEntity(entity, component);
 
 		if (!NetworkServer.active) return;
+		if (!(component is INetworkComponent)) return;
 
 		ComponentAddedMessage msg = new ComponentAddedMessage
 		{
 			entityId = entity.id,
-			componentId = 0
+			componentId = ComponentLookup.Get(component.GetType())
 		};
 		
 		NetworkServer.SendToAll(msg);
@@ -113,6 +129,15 @@ public class NetworkWorld : World
 		base.OnComponentRemovedFromEntity(entity, component);
 
 		if (!NetworkServer.active) return;
+		if (!(component is INetworkComponent)) return;
+
+		ComponentRemovedMessage msg = new ComponentRemovedMessage
+		{
+			entityId = entity.id,
+			componentId = ComponentLookup.Get(component.GetType())
+		};
+		
+		NetworkServer.SendToAll(msg);
 
 		Debug.Log("A component was removed");
 	}
@@ -123,9 +148,7 @@ public class NetworkWorld : World
 
 		if (!NetworkServer.active) return;
 		if (!(component is INetworkComponent)) return;
-
-
-		//TODO: This is firing on the host and sending to itself
+		
 		INetworkComponent networkComponent = (INetworkComponent) component;
 		networkComponent.SendMessage(true);
 		
