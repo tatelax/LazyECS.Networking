@@ -81,6 +81,16 @@ public class NetworkWorld : World
 		NetworkServer.SendToAll(msg);
 	}
 
+	public override void OnEntityDestroyed(Entity entity)
+	{
+		base.OnEntityDestroyed(entity);
+		
+		if (!NetworkServer.active) return;
+
+		DestroyEntityMessage msg = new DestroyEntityMessage{id = entity.id};
+		NetworkServer.SendToAll(msg);
+	}
+
 	public override void OnComponentAddedToEntity(Entity entity, IComponent component)
 	{
 		base.OnComponentAddedToEntity(entity, component);
