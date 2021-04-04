@@ -9,6 +9,7 @@ public class NetworkWorld : World
 {
 	protected NetworkWorld()
 	{
+		//TODO: This is going to overwrite the handlers for all other worlds!
 		NetworkClient.RegisterHandler<CreateEntityMessage>(CreateEntityMessageReceived);
 		NetworkClient.RegisterHandler<DestroyEntityMessage>(DestroyEntityMessageReceived);
 		NetworkClient.RegisterHandler<ComponentAddedMessage>(ComponentAddedMessageRecieved);
@@ -148,7 +149,7 @@ public class NetworkWorld : World
 		if (!(component is INetworkComponent)) return;
 		
 		INetworkComponent networkComponent = (INetworkComponent) component;
-		networkComponent.SendMessage(true);
+		networkComponent.SendMessage(0, entity.id, true);
 		
 		Debug.Log("A component was set");
 	}
