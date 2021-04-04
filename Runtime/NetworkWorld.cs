@@ -7,16 +7,14 @@ using UnityEngine;
 
 public class NetworkWorld : World
 {
-	public override void Init()
+	protected NetworkWorld()
 	{
-		base.Init();
 		NetworkClient.RegisterHandler<CreateEntityMessage>(CreateEntityMessageReceived);
 		NetworkClient.RegisterHandler<DestroyEntityMessage>(DestroyEntityMessageReceived);
 		NetworkClient.RegisterHandler<ComponentAddedMessage>(ComponentAddedMessageRecieved);
 		NetworkClient.RegisterHandler<ComponentRemovedMessage>(ComponentRemovedMessageRecieved);
 	}
-
-
+	
 	/*
 	 *
  	* 
@@ -154,5 +152,6 @@ public class NetworkWorld : World
 		
 		Debug.Log("A component was set");
 	}
+
 
 }
