@@ -14,6 +14,11 @@ public class NetworkWorld : World
 		NetworkClient.RegisterHandler<DestroyEntityMessage>(DestroyEntityMessageReceived);
 		NetworkClient.RegisterHandler<ComponentAddedMessage>(ComponentAddedMessageRecieved);
 		NetworkClient.RegisterHandler<ComponentRemovedMessage>(ComponentRemovedMessageRecieved);
+		
+		NetworkServer.RegisterHandler<CreateEntityMessage>(CreateEntityMessageReceived);
+		NetworkServer.RegisterHandler<DestroyEntityMessage>(DestroyEntityMessageReceived);
+		NetworkServer.RegisterHandler<ComponentAddedMessage>(ComponentAddedMessageRecieved);
+		NetworkServer.RegisterHandler<ComponentRemovedMessage>(ComponentRemovedMessageRecieved);
 	}
 	
 	/*
@@ -25,9 +30,26 @@ public class NetworkWorld : World
  	*/
 	
 	
+	private void CreateEntityMessageReceived(NetworkConnection conn, CreateEntityMessage msg)
+	{
+		if (conn.connectionId == 0 && NetworkServer.active) // Check if we are the host might not work for dedicated servers
+			return;
+
+		if (!NetworkServer.active && Entities.ContainsKey(msg.id)) return; // We're a client and we told the server to create an entity, which it did and send that msg to all clients including us! 
+		CreateEntity(msg.id, true);
+	}
+	
+	private void DestroyEntityMessageReceived(NetworkConnection conn, DestroyEntityMessage msg)
+	{
+		if (conn.connectionId == 0 && NetworkServer.active) // Check if we are the host might not work for dedicated servers
+			return;
+
+		DestroyEntity(msg.id);
+	}
+	
 	private void ComponentAddedMessageRecieved(NetworkConnection conn, ComponentAddedMessage msg)
 	{
-		if (conn.connectionId == 0 && NetworkServer.active) // Check if we are the host
+		if (conn.connectionId == 0 && NetworkServer.active) // Check if we are the host might not work for dedicated servers
 			return;
 
 		if (!Entities.ContainsKey(msg.entityId))
@@ -47,7 +69,7 @@ public class NetworkWorld : World
 	
 	private void ComponentRemovedMessageRecieved(NetworkConnection conn, ComponentRemovedMessage msg)
 	{
-		if (conn.connectionId == 0 && NetworkServer.active) // Check if we are the host
+		if (conn.connectionId == 0 && NetworkServer.active) // Check if we are the host might not work for dedicated servers
 			return;
 		
 		if (!Entities.ContainsKey(msg.entityId))
@@ -60,22 +82,6 @@ public class NetworkWorld : World
 		entity.Remove(msg.componentId);
 	}
 
-	private void CreateEntityMessageReceived(NetworkConnection conn, CreateEntityMessage msg)
-	{
-		if (conn.connectionId == 0 && NetworkServer.active) // Check if we are the host
-			return;
-
-		CreateEntity(msg.id);
-	}
-	
-	private void DestroyEntityMessageReceived(NetworkConnection conn, DestroyEntityMessage msg)
-	{
-		if (conn.connectionId == 0 && NetworkServer.active) // Check if we are the host
-			return;
-
-		DestroyEntity(msg.id);
-	}
-
 	
 	/*
 	 *
@@ -85,14 +91,21 @@ public class NetworkWorld : World
 	 * 
 	 */
 	
-	public override void OnEntityCreated(Entity entity)
+	
+	public override void OnEntityCreated(Entity entity, bool entityCreatedFromNetworkMessage)
 	{
-		base.OnEntityCreated(entity);
-
-		if (!NetworkServer.active) return;
+		base.OnEntityCreated(entity, entityCreatedFromNetworkMessage); // Never skip this because this is how groups get updates
+		
+		if (entityCreatedFromNetworkMessage && NetworkClient.active && !NetworkServer.active) return; // We're a client and the server said to create an entity. We don't send a message. We just do what we are told!
 
 		CreateEntityMessage msg = new CreateEntityMessage {id = entity.id};
-		NetworkServer.SendToAll(msg);
+		
+		if(NetworkServer.active)
+			NetworkServer.SendToAll(msg);
+		else
+		{
+			NetworkClient.Send(msg);
+		}
 	}
 
 	public override void OnEntityDestroyed(Entity entity)
@@ -109,7 +122,6 @@ public class NetworkWorld : World
 	{
 		base.OnComponentAddedToEntity(entity, component);
 
-		if (!NetworkServer.active) return;
 		if (!(component is INetworkComponent)) return;
 
 		ComponentAddedMessage msg = new ComponentAddedMessage
@@ -118,7 +130,10 @@ public class NetworkWorld : World
 			componentId = ComponentLookup.Get(component.GetType())
 		};
 		
-		NetworkServer.SendToAll(msg);
+		if(NetworkServer.active)
+			NetworkServer.SendToAll(msg);
+		else 
+			NetworkClient.Send(msg);
 		
 		Debug.Log("A component was added");
 	}
