@@ -80,6 +80,8 @@ public class NetworkWorld : World
 		
 		Entity entity = Entities[msg.entityId];
 		entity.Remove(msg.componentId);
+		
+		Debug.Log("Received a message to add component " + msg.componentId + " to " + msg.entityId);
 	}
 
 	
@@ -112,6 +114,7 @@ public class NetworkWorld : World
 	{
 		base.OnEntityDestroyed(entity);
 		
+		//TODOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
 		if (!NetworkServer.active) return;
 
 		DestroyEntityMessage msg = new DestroyEntityMessage{id = entity.id};
@@ -151,23 +154,21 @@ public class NetworkWorld : World
 			componentId = ComponentLookup.Get(component.GetType())
 		};
 		
+		//TODOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+
 		NetworkServer.SendToAll(msg);
 
-		Debug.Log("A component was removed");
+		Debug.Log($"{component.GetType()} component was removed");
 	}
 
-	public override void OnComponentSetOnEntity(Entity entity, IComponent component)
+	public override void OnComponentSetOnEntity(Entity entity, IComponent component, bool setFromNetworkMessage = false)
 	{
 		base.OnComponentSetOnEntity(entity, component);
 
-		if (!NetworkServer.active) return;
 		if (!(component is INetworkComponent)) return;
-		
+
 		INetworkComponent networkComponent = (INetworkComponent) component;
-		networkComponent.SendMessage(0, entity.id, true);
-		
-		Debug.Log("A component was set");
+	   
+		networkComponent.SendMessage(0, entity.id, NetworkServer.active, setFromNetworkMessage);
 	}
-
-
 }
