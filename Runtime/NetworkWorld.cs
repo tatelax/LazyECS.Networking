@@ -1,4 +1,5 @@
-﻿using LazyECS;
+﻿using System.Net;
+using LazyECS;
 using LazyECS.Component;
 using LazyECS.Entity;
 using Mirror;
@@ -44,7 +45,8 @@ public class NetworkWorld : World
 		if (conn.connectionId == 0 && NetworkServer.active) // Check if we are the host might not work for dedicated servers
 			return;
 
-		DestroyEntity(msg.id);
+		if (!NetworkServer.active && !Entities.ContainsKey(msg.id)) return; // We're a client and we told the server to destroy an entity, which it did and send that msg to all clients including us! 
+		DestroyEntity(msg.id, true);
 	}
 	
 	private void ComponentAddedMessageRecieved(NetworkConnection conn, ComponentAddedMessage msg)
@@ -110,15 +112,18 @@ public class NetworkWorld : World
 		}
 	}
 
-	public override void OnEntityDestroyed(Entity entity)
+	public override void OnEntityDestroyed(Entity entity, bool entityDestroyedFromNetworkMessage = false)
 	{
-		base.OnEntityDestroyed(entity);
+		base.OnEntityDestroyed(entity, entityDestroyedFromNetworkMessage);
 		
-		//TODOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
-		if (!NetworkServer.active) return;
-
+		if (entityDestroyedFromNetworkMessage && NetworkClient.active && !NetworkServer.active) return; // We're a client and the server said to destroy an entity. We don't send a message. We just do what we are told!
+		
 		DestroyEntityMessage msg = new DestroyEntityMessage{id = entity.id};
-		NetworkServer.SendToAll(msg);
+		
+		if(NetworkServer.active)
+			NetworkServer.SendToAll(msg);
+		else
+			NetworkClient.Send(msg);
 	}
 
 	public override void OnComponentAddedToEntity(Entity entity, IComponent component)
