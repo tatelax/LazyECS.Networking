@@ -29,6 +29,7 @@ public static class NetworkWorldMessageHandler
 		if (!NetworkServer.active && world.Entities.ContainsKey(msg.id)) return; // We're a client and we told the server to create an entity, which it did and send that msg to all clients including us! 
 		world.CreateEntity(msg.id, true);
 	}
+	
 	private static void DestroyEntityMessageReceived(NetworkConnection conn, DestroyEntityMessage msg)
 	{
 		if (conn.connectionId == 0 && NetworkServer.active) // Check if we are the host might not work for dedicated servers
@@ -57,7 +58,6 @@ public static class NetworkWorldMessageHandler
 
 		if (!entity.Has(msg.componentId))
 		{
-			Debug.Log($"cool {msg.entityId} {msg.componentId}");
 			entity.Add(msg.componentId);
 		}
 	}
@@ -79,7 +79,5 @@ public static class NetworkWorldMessageHandler
 		
 		if(entity.Has(msg.componentId))
 			entity.Remove(msg.componentId);
-		
-		Debug.Log("Received a message to add component " + msg.componentId + " to " + msg.entityId);
 	}
 }

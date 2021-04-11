@@ -4,6 +4,5 @@ public class NetworkSimulationController : SimulationController
 	{
 		base.Awake();
 			
-		NetworkWorldMessageHandler.RegisterHandlers();
 	}
 }
