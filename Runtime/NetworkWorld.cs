@@ -1,5 +1,4 @@
-﻿using System.Net;
-using LazyECS;
+﻿using LazyECS;
 using LazyECS.Component;
 using LazyECS.Entity;
 using Mirror;
@@ -8,95 +7,14 @@ using UnityEngine;
 
 public class NetworkWorld : World
 {
-	protected NetworkWorld()
-	{
-		//TODO: This is going to overwrite the handlers for all other worlds!
-		NetworkClient.RegisterHandler<CreateEntityMessage>(CreateEntityMessageReceived);
-		NetworkClient.RegisterHandler<DestroyEntityMessage>(DestroyEntityMessageReceived);
-		NetworkClient.RegisterHandler<ComponentAddedMessage>(ComponentAddedMessageRecieved);
-		NetworkClient.RegisterHandler<ComponentRemovedMessage>(ComponentRemovedMessageRecieved);
-		
-		NetworkServer.RegisterHandler<CreateEntityMessage>(CreateEntityMessageReceived);
-		NetworkServer.RegisterHandler<DestroyEntityMessage>(DestroyEntityMessageReceived);
-		NetworkServer.RegisterHandler<ComponentAddedMessage>(ComponentAddedMessageRecieved);
-		NetworkServer.RegisterHandler<ComponentRemovedMessage>(ComponentRemovedMessageRecieved);
-	}
-	
-	/*
-	 *
- 	* 
- 	*       NETWORK EVENTS
- 	*
- 	* 
- 	*/
-	
-	
-	private void CreateEntityMessageReceived(NetworkConnection conn, CreateEntityMessage msg)
-	{
-		if (conn.connectionId == 0 && NetworkServer.active) // Check if we are the host might not work for dedicated servers
-			return;
+	private int WorldId;
 
-		if (!NetworkServer.active && Entities.ContainsKey(msg.id)) return; // We're a client and we told the server to create an entity, which it did and send that msg to all clients including us! 
-		CreateEntity(msg.id, true);
-	}
-	
-	private void DestroyEntityMessageReceived(NetworkConnection conn, DestroyEntityMessage msg)
+	public override void Start()
 	{
-		if (conn.connectionId == 0 && NetworkServer.active) // Check if we are the host might not work for dedicated servers
-			return;
+		WorldId = SimulationController.Instance.GetWorldId(this);
 
-		if (!NetworkServer.active && !Entities.ContainsKey(msg.id)) return; // We're a client and we told the server to destroy an entity, which it did and send that msg to all clients including us! 
-		DestroyEntity(msg.id, true);
+		base.Start();
 	}
-	
-	private void ComponentAddedMessageRecieved(NetworkConnection conn, ComponentAddedMessage msg)
-	{
-		if (conn.connectionId == 0 && NetworkServer.active) // Check if we are the host might not work for dedicated servers
-			return;
-
-		if (!Entities.ContainsKey(msg.entityId))
-		{
-			Debug.LogError("Tried to add a component to an entity that didnt exist!");
-			return;
-		}
-		
-		Entity entity = Entities[msg.entityId];
-
-		if (!entity.Has(msg.componentId))
-		{
-			Debug.Log($"cool {msg.entityId} {msg.componentId}");
-			entity.Add(msg.componentId);
-		}
-	}
-	
-	private void ComponentRemovedMessageRecieved(NetworkConnection conn, ComponentRemovedMessage msg)
-	{
-		if (conn.connectionId == 0 && NetworkServer.active) // Check if we are the host might not work for dedicated servers
-			return;
-		
-		if (!Entities.ContainsKey(msg.entityId))
-		{
-			Debug.LogError("Tried to remove a component to from entity that didnt exist!");
-			return;
-		}
-		
-		Entity entity = Entities[msg.entityId];
-		
-		if(entity.Has(msg.componentId))
-			entity.Remove(msg.componentId);
-		
-		Debug.Log("Received a message to add component " + msg.componentId + " to " + msg.entityId);
-	}
-
-	
-	/*
-	 *
-	 * 
-	 *       ENTITY EVENTS
-	 *
-	 * 
-	 */
-	
 	
 	public override void OnEntityCreated(Entity entity, bool entityCreatedFromNetworkMessage)
 	{
@@ -104,7 +22,7 @@ public class NetworkWorld : World
 		
 		if (entityCreatedFromNetworkMessage && NetworkClient.active && !NetworkServer.active) return; // We're a client and the server said to create an entity. We don't send a message. We just do what we are told!
 
-		CreateEntityMessage msg = new CreateEntityMessage {id = entity.id};
+		CreateEntityMessage msg = new CreateEntityMessage {worldId = WorldId, id = entity.id};
 		
 		if(NetworkServer.active)
 			NetworkServer.SendToAll(msg);
@@ -120,7 +38,7 @@ public class NetworkWorld : World
 		
 		if (entityDestroyedFromNetworkMessage && NetworkClient.active && !NetworkServer.active) return; // We're a client and the server said to destroy an entity. We don't send a message. We just do what we are told!
 		
-		DestroyEntityMessage msg = new DestroyEntityMessage{id = entity.id};
+		DestroyEntityMessage msg = new DestroyEntityMessage{worldId = WorldId, id = entity.id};
 		
 		if(NetworkServer.active)
 			NetworkServer.SendToAll(msg);
@@ -136,6 +54,7 @@ public class NetworkWorld : World
 
 		ComponentAddedMessage msg = new ComponentAddedMessage
 		{
+			worldId = WorldId,
 			entityId = entity.id,
 			componentId = ComponentLookup.Get(component.GetType())
 		};
@@ -156,6 +75,7 @@ public class NetworkWorld : World
 
 		ComponentRemovedMessage msg = new ComponentRemovedMessage
 		{
+			worldId = WorldId,
 			entityId = entity.id,
 			componentId = ComponentLookup.Get(component.GetType())
 		};
