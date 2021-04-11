@@ -3,6 +3,9 @@ using UnityEngine;
 
 public class LazyNetworkManager : NetworkManager
 {
+    public delegate void ServerConnect(NetworkConnection connection);
+    public event ServerConnect OnServerConnected;
+    
     [SerializeField] private SimulationController simulationController;
 
     private NetworkWorldBufferHandler networkWorldBufferHandler;
@@ -46,5 +49,7 @@ public class LazyNetworkManager : NetworkManager
             return;
         
         networkWorldBufferHandler.BufferClient(conn);
+        
+        OnServerConnected.Invoke(conn);
     }
 }
