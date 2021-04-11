@@ -4,6 +4,8 @@ using Mirror;
 using NetworkMessages;
 using UnityEngine;
 
+// Disable warning about obsolete RegisterHandler
+#pragma warning disable CS0618
 public static class NetworkWorldMessageHandler
 {
 	public static void RegisterHandlers()

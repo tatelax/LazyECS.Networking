@@ -45,8 +45,6 @@ public class LazyNetworkManager : NetworkManager
         if (conn.connectionId == 0 && NetworkServer.active) // Check if we are the host might not work for dedicated servers
             return;
         
-        Debug.Log("BUFFERING!");
-        
-        networkWorldBufferHandler.OnClientConnected(conn);
+        networkWorldBufferHandler.BufferClient(conn);
     }
 }
