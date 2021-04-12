@@ -8,14 +8,14 @@ public class LazyNetworkManager : NetworkManager
     
     [SerializeField] private SimulationController simulationController;
 
-    private NetworkWorldBufferHandler networkWorldBufferHandler;
+    private NetworkWorldStateHandler networkWorldStateHandler;
     
     public override void Awake()
     {
         base.Awake();
 
         NetworkWorldMessageHandler.RegisterHandlers();
-        networkWorldBufferHandler = new NetworkWorldBufferHandler();
+        networkWorldStateHandler = new NetworkWorldStateHandler();
         
         if (simulationController == null)
         {
@@ -48,7 +48,7 @@ public class LazyNetworkManager : NetworkManager
         if (conn.connectionId == 0 && NetworkServer.active) // Check if we are the host might not work for dedicated servers
             return;
         
-        networkWorldBufferHandler.BufferClient(conn);
+        networkWorldStateHandler.BufferClient(conn);
         
         OnServerConnected.Invoke(conn);
     }
