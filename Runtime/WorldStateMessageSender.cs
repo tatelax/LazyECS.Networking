@@ -19,6 +19,9 @@ public class WorldStateMessageSender
 	{
 		foreach (KeyValuePair<int,IWorld> world in SimulationController.Instance.Worlds)
 		{
+			// We only care about NetworkWorlds
+			if (!(world.Value is NetworkWorld)) return;
+
 			world.Value.OnEntityCreatedEvent += (entity, message) => { OnEntityCreated(world.Key, entity, message); };
 			world.Value.OnEntityDestroyedEvent += (entity, message) => { OnEntityDestroyed(world.Key, entity, message); };
 			world.Value.OnComponentAddedToEntityEvent += (entity, component) => { OnComponentAddedToEntity(world.Key, entity, component); };
@@ -116,6 +119,9 @@ public class WorldStateMessageSender
 		// Loop through all worlds
 		foreach (KeyValuePair<int, IWorld> world in SimulationController.Instance.Worlds)
 		{
+			// We only care about NetworkWorlds
+			if (!(world.Value is NetworkWorld)) return;
+			
 			// Loop through all the entities in that network world
 			//TODO: What happens if an entity is created while the player is joining?
 			foreach (KeyValuePair<int, Entity> entity in world.Value.Entities.ToList())
