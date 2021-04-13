@@ -98,7 +98,7 @@ public class WorldStateMessageSender
 	private void OnComponentSetOnEntity(int worldId, Entity entity, IComponent component, bool setFromNetworkMessage = false)
 	{
 		if (setFromNetworkMessage && NetworkClient.active && !NetworkServer.active)
-			return; // We're a client and the server said to create an entity. We don't send a message. We just do what we are told!
+			return; // We're a client and the server said to set a component value. We don't send a message. We just do what we are told!
 		
 		if (!(component is INetworkComponent)) return;
 
@@ -107,7 +107,7 @@ public class WorldStateMessageSender
 		switch (networkComponent.Get().GetType().Name)
 		{
 			case "String":
-				SetStringComponent(worldId, entity.id, ComponentLookup.Get(component.GetType()),(string)networkComponent.Get());
+				new StringComponentMessage(worldId, entity.id, ComponentLookup.Get(component.GetType()),(string)networkComponent.Get());
 				break;
 			default:
 				Debug.LogError("Unable to send message. Unknown type!");
@@ -115,21 +115,7 @@ public class WorldStateMessageSender
 		}
 	}
 
-	private void SetStringComponent(int worldId, int entityId, int componentId, string value)
-	{
-		StringComponentMessage msg = new StringComponentMessage
-		{
-			worldID = worldId,
-			entityID = entityId,
-			componentID = componentId,
-			Value = value
-		};
 
-		if (NetworkServer.active)
-			NetworkServer.SendToAll(msg);
-		else
-			NetworkClient.Send(msg);
-	}
 
 	/// <summary>
 	/// When a client joins, we need to give them all of the entities, components, and component values so they are in sync with the server
