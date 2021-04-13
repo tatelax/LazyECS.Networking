@@ -102,17 +102,7 @@ public class WorldStateMessageSender
 		
 		if (!(component is INetworkComponent)) return;
 
-		INetworkComponent networkComponent = (INetworkComponent) component;
-
-		switch (networkComponent.Get().GetType().Name)
-		{
-			case "String":
-				new StringComponentMessage(worldId, entity.id, ComponentLookup.Get(component.GetType()),(string)networkComponent.Get());
-				break;
-			default:
-				Debug.LogError("Unable to send message. Unknown type!");
-				break;
-		}
+		SendComponentValue((INetworkComponent)component, worldId, entity.id);
 	}
 
 
@@ -151,10 +141,35 @@ public class WorldStateMessageSender
 					conn.Send(addComponentMessage);
 
 					// Send a message to the client to set the component's value
-					// INetworkComponent networkComponent = (INetworkComponent) component.Value;
-					// networkComponent.SendMessage(world.Key, entity.Key, false, true, conn);
+					INetworkComponent networkComponent = (INetworkComponent) component.Value;
+					SendComponentValue(networkComponent, world.Key, entity.Key);
 				}
 			}
+		}
+	}
+
+	private void SendComponentValue(INetworkComponent networkComponent, int worldId, int entityId)
+	{
+		switch (networkComponent.Get().GetType().Name)
+		{
+			case "String":
+				new StringComponentMessage(worldId, entityId, ComponentLookup.Get(networkComponent.GetType()),(string)networkComponent.Get());
+				break;
+			case "Int32":
+				new IntComponentMessage(worldId, entityId, ComponentLookup.Get(networkComponent.GetType()),(int)networkComponent.Get());
+				break;
+			case "Single":
+				new FloatComponentMessage(worldId, entityId, ComponentLookup.Get(networkComponent.GetType()),(float)networkComponent.Get());
+				break;
+			case "Boolean":
+				new BoolComponentMessage(worldId, entityId, ComponentLookup.Get(networkComponent.GetType()),(bool)networkComponent.Get());
+				break;
+			case "Vector3":
+				new Vector3ComponentMessage(worldId, entityId, ComponentLookup.Get(networkComponent.GetType()),(Vector3)networkComponent.Get());
+				break;
+			default:
+				Debug.LogError($"Unable to send message. Unknown type: {networkComponent.Get().GetType().Name}");
+				break;
 		}
 	}
 }

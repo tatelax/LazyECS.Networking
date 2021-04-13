@@ -31,7 +31,7 @@ public static class WorldStateMessageReceiver
 		if (conn.connectionId == 0 && NetworkServer.active) // Check if we are the host might not work for dedicated servers
 			return;
 
-		Debug.Log("Create entity message received");
+		Debug.Log($"Create entity message received id: {msg.id}");
 		
 		IWorld world = SimulationController.Instance.GetWorld(msg.worldId);
 		
