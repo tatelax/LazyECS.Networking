@@ -15,17 +15,36 @@ public static class WorldStateMessageReceiver
 		NetworkClient.RegisterHandler<ComponentAddedMessage>(ComponentAddedMessageReceived);
 		NetworkClient.RegisterHandler<ComponentRemovedMessage>(ComponentRemovedMessageReceived);
 		
-		NetworkClient.RegisterHandler<StringComponentMessage>(StringComponentMessageReceived);
-		
 		NetworkServer.RegisterHandler<CreateEntityMessage>(CreateEntityMessageReceived);
 		NetworkServer.RegisterHandler<DestroyEntityMessage>(DestroyEntityMessageReceived);
 		NetworkServer.RegisterHandler<ComponentAddedMessage>(ComponentAddedMessageReceived);
 		NetworkServer.RegisterHandler<ComponentRemovedMessage>(ComponentRemovedMessageReceived);
 		
+		NetworkClient.RegisterHandler<StringComponentMessage>(StringComponentMessageReceived);
 		NetworkServer.RegisterHandler<StringComponentMessage>(StringComponentMessageReceived);
+		
+		NetworkClient.RegisterHandler<FloatComponentMessage>(FloatComponentMessageReceived);
+		NetworkServer.RegisterHandler<FloatComponentMessage>(FloatComponentMessageReceived);
+		
+		NetworkClient.RegisterHandler<IntComponentMessage>(IntComponentMessageReceived);
+		NetworkServer.RegisterHandler<IntComponentMessage>(IntComponentMessageReceived);
+		
+		NetworkClient.RegisterHandler<BoolComponentMessage>(BoolComponentMessageReceived);
+		NetworkServer.RegisterHandler<BoolComponentMessage>(BoolComponentMessageReceived);
+		
+		NetworkClient.RegisterHandler<Vector3ComponentMessage>(Vector3ComponentMessageReceived);
+		NetworkServer.RegisterHandler<Vector3ComponentMessage>(Vector3ComponentMessageReceived);
 	}
 
-
+/*
+ *
+ *
+ *    ENTITY CHANGES
+ * 
+ * 
+ */
+	
+	
 	private static void CreateEntityMessageReceived(NetworkConnection conn, CreateEntityMessage msg)
 	{
 		if (conn.connectionId == 0 && NetworkServer.active) // Check if we are the host might not work for dedicated servers
@@ -90,13 +109,46 @@ public static class WorldStateMessageReceiver
 			entity.Remove(msg.componentId);
 	}
 	
+/*
+ *
+ *
+ *    COMPONENT VALUE CHANGES
+ * 
+ * 
+ */
+
 	private static void StringComponentMessageReceived(NetworkConnection conn, StringComponentMessage msg)
 	{
-		if (conn.connectionId == 0 && NetworkServer.active) // Check if we are the host might not work for dedicated servers
+		SetComponentFromNetworkMessage(conn.connectionId, msg.worldID, msg.entityID, msg.componentID, msg.Value);
+	}
+	
+	private static void Vector3ComponentMessageReceived(NetworkConnection conn, Vector3ComponentMessage msg)
+	{
+		SetComponentFromNetworkMessage(conn.connectionId, msg.worldID, msg.entityID, msg.componentID, msg.Value);
+	}
+
+	private static void BoolComponentMessageReceived(NetworkConnection conn, BoolComponentMessage msg)
+	{
+		SetComponentFromNetworkMessage(conn.connectionId, msg.worldID, msg.entityID, msg.componentID, msg.Value);
+	}
+
+	private static void IntComponentMessageReceived(NetworkConnection conn, IntComponentMessage msg)
+	{
+		SetComponentFromNetworkMessage(conn.connectionId, msg.worldID, msg.entityID, msg.componentID, msg.Value);
+	}
+
+	private static void FloatComponentMessageReceived(NetworkConnection conn, FloatComponentMessage msg)
+	{
+		SetComponentFromNetworkMessage(conn.connectionId, msg.worldID, msg.entityID, msg.componentID, msg.Value);
+	}
+
+	private static void SetComponentFromNetworkMessage(int connectionId, int worldId, int entityId, int componentId, object value)
+	{
+		if (connectionId == 0 && NetworkServer.active) // Check if we are the host might not work for dedicated servers
 			return;
 		
-		IWorld world = SimulationController.Instance.GetWorld(msg.worldID);
+		IWorld world = SimulationController.Instance.GetWorld(worldId);
 		
-		world.Entities[msg.entityID].Set(msg.componentID, msg.Value, true);
+		world.Entities[entityId].Set(componentId, value, true);
 	}
 }

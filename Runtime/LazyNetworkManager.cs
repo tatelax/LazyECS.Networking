@@ -31,7 +31,13 @@ public class LazyNetworkManager : NetworkManager
     public override void OnClientConnect(NetworkConnection conn)
     {
         base.OnClientConnect(conn);
-		
+
+        if (NetworkServer.active) // We're a host!
+        {
+            OnClientConnectedEvent?.Invoke(conn);
+            return; 
+        }
+        
         simulationController.gameObject.SetActive(true);
         worldStateMessageSender = new WorldStateMessageSender();
 

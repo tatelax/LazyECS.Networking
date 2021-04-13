@@ -150,6 +150,7 @@ public class WorldStateMessageSender
 
 	private void SendComponentValue(INetworkComponent networkComponent, int worldId, int entityId)
 	{
+		Debug.Log($"Sending component value {networkComponent.Get().GetType().Name}");
 		switch (networkComponent.Get().GetType().Name)
 		{
 			case "String":
