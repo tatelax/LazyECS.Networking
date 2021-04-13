@@ -3,24 +3,21 @@ using UnityEngine;
 
 public class LazyNetworkManager : NetworkManager
 {
-    public delegate void ServerConnect(NetworkConnection connection);
-    public event ServerConnect OnServerConnected;
-    
     [SerializeField] private SimulationController simulationController;
-
-    private NetworkWorldStateHandler networkWorldStateHandler;
+    
+    public delegate void ServerConnect(NetworkConnection connection);
+    public delegate void ClientConnect(NetworkConnection connection);
+    
+    public event ServerConnect OnServerConnectedEvent; //A player joined
+    public event ClientConnect OnClientConnectedEvent; //Client joined the server
+        
+    private WorldStateMessageSender worldStateMessageSender;
     
     public override void Awake()
     {
         base.Awake();
 
-        NetworkWorldMessageHandler.RegisterHandlers();
-        networkWorldStateHandler = new NetworkWorldStateHandler();
-        
-        if (simulationController == null)
-        {
-            Debug.LogError("Assign Simulation Controller in LazyNetworkManager!");
-        }
+        WorldStateMessageReceiver.RegisterHandlers();
     }
     
     public override void OnStartServer()
@@ -28,6 +25,7 @@ public class LazyNetworkManager : NetworkManager
         base.OnStartServer();
 		
         simulationController.gameObject.SetActive(true);
+        worldStateMessageSender = new WorldStateMessageSender();
     }
     
     public override void OnClientConnect(NetworkConnection conn)
@@ -35,6 +33,9 @@ public class LazyNetworkManager : NetworkManager
         base.OnClientConnect(conn);
 		
         simulationController.gameObject.SetActive(true);
+        worldStateMessageSender = new WorldStateMessageSender();
+
+        OnClientConnectedEvent?.Invoke(conn);
     }
 
     /// <summary>
@@ -48,8 +49,8 @@ public class LazyNetworkManager : NetworkManager
         if (conn.connectionId == 0 && NetworkServer.active) // Check if we are the host might not work for dedicated servers
             return;
         
-        networkWorldStateHandler.BufferClient(conn);
-        
-        OnServerConnected.Invoke(conn);
+        worldStateMessageSender.BufferClient(conn);
+
+        OnServerConnectedEvent?.Invoke(conn);
     }
 }

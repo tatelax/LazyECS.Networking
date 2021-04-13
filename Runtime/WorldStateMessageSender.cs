@@ -8,9 +8,9 @@ using Mirror;
 using NetworkMessages;
 using UnityEngine;
 
-public class NetworkWorldStateHandler
+public class WorldStateMessageSender
 {
-	public NetworkWorldStateHandler()
+	public WorldStateMessageSender()
 	{
 		SimulationController.Instance.OnWorldsInitialized += InstanceOnOnWorldsInitialized;
 	}
@@ -32,6 +32,8 @@ public class NetworkWorldStateHandler
 		if (entityCreatedFromNetworkMessage && NetworkClient.active && !NetworkServer.active)
 			return; // We're a client and the server said to create an entity. We don't send a message. We just do what we are told!
 
+		Debug.Log("A local entity was created....creating a network message");
+		
 		CreateEntityMessage msg = new CreateEntityMessage {worldId = worldId, id = entity.id};
 
 		if (NetworkServer.active)
@@ -95,6 +97,9 @@ public class NetworkWorldStateHandler
 
 	private void OnComponentSetOnEntity(int worldId, Entity entity, IComponent component, bool setFromNetworkMessage = false)
 	{
+		if (setFromNetworkMessage && NetworkClient.active && !NetworkServer.active)
+			return; // We're a client and the server said to create an entity. We don't send a message. We just do what we are told!
+		
 		if (!(component is INetworkComponent)) return;
 
 		INetworkComponent networkComponent = (INetworkComponent) component;
@@ -102,16 +107,28 @@ public class NetworkWorldStateHandler
 		switch (networkComponent.Get().GetType().Name)
 		{
 			case "String":
-				StringComponentMessage msg = new StringComponentMessage
-				{
-					worldID = worldId,
-					entityID = entity.id,
-					Value = (string) networkComponent.Get()
-				};
-
-
+				SetStringComponent(worldId, entity.id, ComponentLookup.Get(component.GetType()),(string)networkComponent.Get());
+				break;
+			default:
+				Debug.LogError("Unable to send message. Unknown type!");
 				break;
 		}
+	}
+
+	private void SetStringComponent(int worldId, int entityId, int componentId, string value)
+	{
+		StringComponentMessage msg = new StringComponentMessage
+		{
+			worldID = worldId,
+			entityID = entityId,
+			componentID = componentId,
+			Value = value
+		};
+
+		if (NetworkServer.active)
+			NetworkServer.SendToAll(msg);
+		else
+			NetworkClient.Send(msg);
 	}
 
 	/// <summary>
