@@ -14,7 +14,7 @@ This is a networking addon for LazyECS. It uses Mirror behind the scenes to auto
 # How To Install
 LazyECS Networking can be installed via the Unity Package Manager. This doesn't seem to work on Unity 2020 due to a bug so it can be installed by downloading source and importing as normal.
 ```
-Window/Package Manager => + Button => "Add package from git URL..." => https://github.com/tatelax/LazyECS.git
+Window/Package Manager => + Button => "Add package from git URL..." => https://github.com/tatelax/LazyECS.Networking.git
 ```
 # Usage
 
