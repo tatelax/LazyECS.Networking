@@ -11,14 +11,17 @@ public static class WorldStateMessageReceiver
 	public static void RegisterHandlers()
 	{
 		NetworkClient.RegisterHandler<CreateEntityMessage>(CreateEntityMessageReceived);
-		NetworkClient.RegisterHandler<DestroyEntityMessage>(DestroyEntityMessageReceived);
-		NetworkClient.RegisterHandler<ComponentAddedMessage>(ComponentAddedMessageReceived);
-		NetworkClient.RegisterHandler<ComponentRemovedMessage>(ComponentRemovedMessageReceived);
-		
 		NetworkServer.RegisterHandler<CreateEntityMessage>(CreateEntityMessageReceived);
+
+		NetworkClient.RegisterHandler<DestroyEntityMessage>(DestroyEntityMessageReceived);
 		NetworkServer.RegisterHandler<DestroyEntityMessage>(DestroyEntityMessageReceived);
+
+		NetworkClient.RegisterHandler<ComponentAddedMessage>(ComponentAddedMessageReceived);
 		NetworkServer.RegisterHandler<ComponentAddedMessage>(ComponentAddedMessageReceived);
+
+		NetworkClient.RegisterHandler<ComponentRemovedMessage>(ComponentRemovedMessageReceived);
 		NetworkServer.RegisterHandler<ComponentRemovedMessage>(ComponentRemovedMessageReceived);
+		
 		
 		NetworkClient.RegisterHandler<StringComponentMessage>(StringComponentMessageReceived);
 		NetworkServer.RegisterHandler<StringComponentMessage>(StringComponentMessageReceived);
@@ -36,6 +39,7 @@ public static class WorldStateMessageReceiver
 		NetworkServer.RegisterHandler<Vector3ComponentMessage>(Vector3ComponentMessageReceived);
 	}
 
+	
 /*
  *
  *

@@ -35,16 +35,14 @@ public class WorldStateMessageSender
 		if (entityCreatedFromNetworkMessage && NetworkClient.active && !NetworkServer.active)
 			return; // We're a client and the server said to create an entity. We don't send a message. We just do what we are told!
 
-		Debug.Log("A local entity was created....creating a network message");
+		Debug.Log($"A local entity was created....creating a network message {entity.id}");
 		
 		CreateEntityMessage msg = new CreateEntityMessage {worldId = worldId, id = entity.id};
-
+		
 		if (NetworkServer.active)
 			NetworkServer.SendToAll(msg);
 		else
-		{
 			NetworkClient.Send(msg);
-		}
 	}
 
 	private void OnEntityDestroyed(int worldId, Entity entity, bool entityDestroyedFromNetworkMessage = false)
@@ -113,7 +111,7 @@ public class WorldStateMessageSender
 	/// <summary>
 	/// When a client joins, we need to give them all of the entities, components, and component values so they are in sync with the server
 	/// </summary>
-	/// <param name="conn">The NetworkConnection of the player</param>
+	/// <param name="conn">The NetworkConnectio n of the player</param>
 	public void BufferClient(NetworkConnection conn)
 	{
 		// Loop through all worlds
