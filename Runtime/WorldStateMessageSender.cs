@@ -12,11 +12,6 @@ public class WorldStateMessageSender
 {
 	public WorldStateMessageSender()
 	{
-		SimulationController.Instance.OnWorldsInitialized += InstanceOnOnWorldsInitialized;
-	}
-
-	private void InstanceOnOnWorldsInitialized(object sender, EventArgs e)
-	{
 		foreach (KeyValuePair<int,IWorld> world in SimulationController.Instance.Worlds)
 		{
 			// We only care about NetworkWorlds
@@ -35,6 +30,9 @@ public class WorldStateMessageSender
 		if (entityCreatedFromNetworkMessage && NetworkClient.active && !NetworkServer.active)
 			return; // We're a client and the server said to create an entity. We don't send a message. We just do what we are told!
 
+		if(SimulationController.Instance.LogLevel == LogLevel.Verbose)
+			Debug.Log($"<color=#00ffff>[LazyECS Networking] Entity <b>CREATED</b> with id {entity.id} in world {worldId} sending message to clients...</color>");
+		
 		CreateEntityMessage msg = new CreateEntityMessage {worldId = worldId, id = entity.id};
 		
 		if (NetworkServer.active)
@@ -48,6 +46,9 @@ public class WorldStateMessageSender
 		if (entityDestroyedFromNetworkMessage && NetworkClient.active && !NetworkServer.active)
 			return; // We're a client and the server said to destroy an entity. We don't send a message. We just do what we are told!
 
+		if(SimulationController.Instance.LogLevel == LogLevel.Verbose)
+			Debug.Log($"<color=#00ffff>[LazyECS Networking] Entity <b>DESTROYED</b> with id {entity.id} in world {worldId} sending message to clients...</color>");
+		
 		DestroyEntityMessage msg = new DestroyEntityMessage {worldId = worldId, id = entity.id};
 
 		if (NetworkServer.active)
@@ -60,6 +61,9 @@ public class WorldStateMessageSender
 	{
 		if (!(component is INetworkComponent)) return;
 
+		if(SimulationController.Instance.LogLevel == LogLevel.Verbose)
+			Debug.Log($"<color=#00ffff>[LazyECS Networking] Component added to entity with id {entity.id} in world {worldId} and component type {component.GetType().Name} sending message to clients...</color>");
+		
 		ComponentAddedMessage msg = new ComponentAddedMessage
 		{
 			worldId = worldId,
@@ -79,6 +83,9 @@ public class WorldStateMessageSender
 	{
 		if (!(component is INetworkComponent)) return;
 
+		if(SimulationController.Instance.LogLevel == LogLevel.Verbose)
+			Debug.Log($"<color=#00ffff>[LazyECS Networking] Component removed to entity with id {entity.id} in world {worldId} and component type {component.GetType().Name} sending message to clients...</color>");
+		
 		ComponentRemovedMessage msg = new ComponentRemovedMessage
 		{
 			worldId = worldId,
@@ -99,6 +106,9 @@ public class WorldStateMessageSender
 		if (setFromNetworkMessage && NetworkClient.active && !NetworkServer.active)
 			return; // We're a client and the server said to set a component value. We don't send a message. We just do what we are told!
 		
+		if(SimulationController.Instance.LogLevel == LogLevel.Verbose)
+			Debug.Log($"<color=#00ffff>[LazyECS Networking] Component set on entity with id {entity.id} in world {worldId} and component type {component.GetType().Name} sending message to clients...</color>");
+		
 		if (!(component is INetworkComponent)) return;
 
 		SendComponentValue((INetworkComponent)component, worldId, entity.id);
@@ -112,6 +122,9 @@ public class WorldStateMessageSender
 	/// <param name="conn">The NetworkConnectio n of the player</param>
 	public void BufferClient(NetworkConnection conn)
 	{
+		if(SimulationController.Instance.LogLevel == LogLevel.Verbose)
+			Debug.Log($"<color=#00ffff>[LazyECS Networking] Buffering client {conn.connectionId}...</color>");
+		
 		// Loop through all worlds
 		foreach (KeyValuePair<int, IWorld> world in SimulationController.Instance.Worlds)
 		{
@@ -120,7 +133,7 @@ public class WorldStateMessageSender
 			
 			// Loop through all the entities in that network world
 			//TODO: What happens if an entity is created while the player is joining?
-			foreach (KeyValuePair<int, Entity> entity in world.Value.Entities.ToList())
+			foreach (KeyValuePair<int, Entity> entity in world.Value.Entities)
 			{
 				// Send a message to the client that connected telling them to create an entity in the same world with the same id
 				CreateEntityMessage createEntityMessage = new CreateEntityMessage {worldId = world.Key, id = entity.Value.id};
@@ -152,7 +165,6 @@ public class WorldStateMessageSender
 
 	private void SendComponentValue(INetworkComponent networkComponent, int worldId, int entityId)
 	{
-		Debug.Log($"Sending component value {networkComponent.Get().GetType().Name}");
 		switch (networkComponent.Get().GetType().Name)
 		{
 			case "String":

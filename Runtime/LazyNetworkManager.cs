@@ -7,9 +7,11 @@ public class LazyNetworkManager : NetworkManager
     
     public delegate void ServerConnect(NetworkConnection connection);
     public delegate void ClientConnect(NetworkConnection connection);
+    public delegate void ServerStart();
     
     public event ServerConnect OnServerConnectedEvent; //A player joined
     public event ClientConnect OnClientConnectedEvent; //Client joined the server
+    public event ServerStart OnServerStartEvent;
         
     private WorldStateMessageSender worldStateMessageSender;
     
@@ -23,9 +25,10 @@ public class LazyNetworkManager : NetworkManager
     public override void OnStartServer()
     {
         base.OnStartServer();
-		
         simulationController.gameObject.SetActive(true);
         worldStateMessageSender = new WorldStateMessageSender();
+        
+        OnServerStartEvent?.Invoke();
     }
     
     public override void OnClientConnect(NetworkConnection conn)
@@ -51,12 +54,14 @@ public class LazyNetworkManager : NetworkManager
     public override void OnServerConnect(NetworkConnection conn)
     {
         base.OnServerConnect(conn);
-        
-        if (conn.connectionId == 0 && NetworkServer.active) // Check if we are the host might not work for dedicated servers
+
+        if (conn.connectionId == 0 && NetworkServer.active) // We're a host!
+        {
+            OnServerConnectedEvent?.Invoke(conn);
             return;
+        }
         
         worldStateMessageSender.BufferClient(conn);
-
         OnServerConnectedEvent?.Invoke(conn);
     }
 }

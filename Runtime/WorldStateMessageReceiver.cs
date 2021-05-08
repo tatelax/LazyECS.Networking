@@ -83,7 +83,7 @@ public static class WorldStateMessageReceiver
 			return;
 
 		if(SimulationController.Instance.LogLevel == LogLevel.Verbose)
-			Debug.Log($"<color=#00ffff>[LazyECS Networking] Component <b>ADDED</b> message received with entity id  {msg.entityId} and component id {msg.componentId} in world {msg.worldId}</color>");
+			Debug.Log($"<color=#00ffff>[LazyECS Networking] Component <b>ADDED</b> message received with entity id  {msg.entityId} and type {ComponentLookup.Get(msg.componentId)} in world {msg.worldId}</color>");
 		
 		IWorld world = SimulationController.Instance.GetWorld(msg.worldId);
 		
@@ -107,7 +107,7 @@ public static class WorldStateMessageReceiver
 			return;
 
 		if(SimulationController.Instance.LogLevel == LogLevel.Verbose)
-			Debug.Log($"<color=#00ffff>[LazyECS Networking] Component <b>REMOVED</b> message received with entity id  {msg.entityId} and component id {msg.componentId} in world {msg.worldId}</color>");
+			Debug.Log($"<color=#00ffff>[LazyECS Networking] Component <b>REMOVED</b> message received with entity id  {msg.entityId} and  and type {ComponentLookup.Get(msg.componentId)} in world {msg.worldId}</color>");
 		
 		IWorld world = SimulationController.Instance.GetWorld(msg.worldId);
 		
@@ -162,7 +162,7 @@ public static class WorldStateMessageReceiver
 			return;
 		
 		if(SimulationController.Instance.LogLevel == LogLevel.Verbose)
-			Debug.Log($"<color=#00ffff>[LazyECS Networking] Component set message received with entity id  {entityId} and component id {componentId} in world {worldId} with type of {value.GetType().Name}</color>");
+			Debug.Log($"<color=#00ffff>[LazyECS Networking] Component set message received with entity id  {entityId} and type {ComponentLookup.Get(componentId)} in world {worldId} with type of {value.GetType().Name}</color>");
 		
 		IWorld world = SimulationController.Instance.GetWorld(worldId);
 		
