@@ -75,8 +75,6 @@ public class WorldStateMessageSender
 			NetworkServer.SendToAll(msg);
 		else
 			NetworkClient.Send(msg);
-
-		Debug.Log("A component was added");
 	}
 
 	private void OnComponentRemovedFromEntity(int worldId, Entity entity, IComponent component)
@@ -97,12 +95,12 @@ public class WorldStateMessageSender
 			NetworkServer.SendToAll(msg);
 		else
 			NetworkClient.Send(msg);
-
-		Debug.Log($"{component.GetType()} component was removed");
 	}
 
 	private void OnComponentSetOnEntity(int worldId, Entity entity, IComponent component, bool setFromNetworkMessage = false)
 	{
+		if (!(component is INetworkComponent)) return;
+
 		if (setFromNetworkMessage && NetworkClient.active && !NetworkServer.active)
 			return; // We're a client and the server said to set a component value. We don't send a message. We just do what we are told!
 		

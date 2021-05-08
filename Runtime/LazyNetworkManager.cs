@@ -7,11 +7,13 @@ public class LazyNetworkManager : NetworkManager
     
     public delegate void ServerConnect(NetworkConnection connection);
     public delegate void ClientConnect(NetworkConnection connection);
+    public delegate void ServerDisconnect(NetworkConnection connection);
     public delegate void ServerStart();
     
     public event ServerConnect OnServerConnectedEvent; //A player joined
     public event ClientConnect OnClientConnectedEvent; //Client joined the server
-    public event ServerStart OnServerStartEvent;
+    public event ServerDisconnect OnServerDisconnectEvent; // Client disconnected from server
+    public event ServerStart OnServerStartEvent; // Server started
         
     private WorldStateMessageSender worldStateMessageSender;
     
@@ -45,6 +47,13 @@ public class LazyNetworkManager : NetworkManager
         worldStateMessageSender = new WorldStateMessageSender();
 
         OnClientConnectedEvent?.Invoke(conn);
+    }
+
+    public override void OnServerDisconnect(NetworkConnection conn)
+    {
+        base.OnServerDisconnect(conn);
+        
+        OnServerDisconnectEvent?.Invoke(conn);
     }
 
     /// <summary>
