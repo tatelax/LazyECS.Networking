@@ -35,8 +35,6 @@ public class WorldStateMessageSender
 		if (entityCreatedFromNetworkMessage && NetworkClient.active && !NetworkServer.active)
 			return; // We're a client and the server said to create an entity. We don't send a message. We just do what we are told!
 
-		Debug.Log($"A local entity was created....creating a network message {entity.id}");
-		
 		CreateEntityMessage msg = new CreateEntityMessage {worldId = worldId, id = entity.id};
 		
 		if (NetworkServer.active)

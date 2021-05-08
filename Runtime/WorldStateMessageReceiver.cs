@@ -54,7 +54,8 @@ public static class WorldStateMessageReceiver
 		if (conn.connectionId == 0 && NetworkServer.active) // Check if we are the host might not work for dedicated servers
 			return;
 
-		Debug.Log($"Create entity message received id: {msg.id}");
+		if(SimulationController.Instance.LogLevel == LogLevel.Verbose)
+			Debug.Log($"<color=#00ffff>[LazyECS Networking] Create entity message received with entity id {msg.id} in world {msg.worldId}</color>");
 		
 		IWorld world = SimulationController.Instance.GetWorld(msg.worldId);
 		
@@ -67,6 +68,9 @@ public static class WorldStateMessageReceiver
 		if (conn.connectionId == 0 && NetworkServer.active) // Check if we are the host might not work for dedicated servers
 			return;
 
+		if(SimulationController.Instance.LogLevel == LogLevel.Verbose)
+			Debug.Log($"<color=#00ffff>[LazyECS Networking] Destroy entity message received with entity id {msg.id} in world {msg.worldId}</color>");
+		
 		IWorld world = SimulationController.Instance.GetWorld(msg.worldId);	
 		
 		if (!NetworkServer.active && !world.Entities.ContainsKey(msg.id)) return; // We're a client and we told the server to destroy an entity, which it did and send that msg to all clients including us! 
@@ -78,6 +82,9 @@ public static class WorldStateMessageReceiver
 		if (conn.connectionId == 0 && NetworkServer.active) // Check if we are the host might not work for dedicated servers
 			return;
 
+		if(SimulationController.Instance.LogLevel == LogLevel.Verbose)
+			Debug.Log($"<color=#00ffff>[LazyECS Networking] Component <b>ADDED</b> message received with entity id  {msg.entityId} and component id {msg.componentId} in world {msg.worldId}</color>");
+		
 		IWorld world = SimulationController.Instance.GetWorld(msg.worldId);
 		
 		if (!world.Entities.ContainsKey(msg.entityId))
@@ -99,6 +106,9 @@ public static class WorldStateMessageReceiver
 		if (conn.connectionId == 0 && NetworkServer.active) // Check if we are the host might not work for dedicated servers
 			return;
 
+		if(SimulationController.Instance.LogLevel == LogLevel.Verbose)
+			Debug.Log($"<color=#00ffff>[LazyECS Networking] Component <b>REMOVED</b> message received with entity id  {msg.entityId} and component id {msg.componentId} in world {msg.worldId}</color>");
+		
 		IWorld world = SimulationController.Instance.GetWorld(msg.worldId);
 		
 		if (!world.Entities.ContainsKey(msg.entityId))
@@ -150,6 +160,9 @@ public static class WorldStateMessageReceiver
 	{
 		if (connectionId == 0 && NetworkServer.active) // Check if we are the host might not work for dedicated servers
 			return;
+		
+		if(SimulationController.Instance.LogLevel == LogLevel.Verbose)
+			Debug.Log($"<color=#00ffff>[LazyECS Networking] Component set message received with entity id  {entityId} and component id {componentId} in world {worldId} with type of {value.GetType().Name}</color>");
 		
 		IWorld world = SimulationController.Instance.GetWorld(worldId);
 		
