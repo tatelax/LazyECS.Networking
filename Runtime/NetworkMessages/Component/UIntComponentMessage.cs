@@ -1,25 +1,25 @@
 ﻿using Mirror;
 
-public struct IntComponentMessage : NetworkMessage
+public struct UIntComponentMessage : NetworkMessage
 {
 	public int worldID;
 	public int entityID;
 	public int componentID;
-	public int Value;
+	public uint Value;
 	
-	public IntComponentMessage(int worldID, int entityID, int componentID, int value)
+	public UIntComponentMessage(int worldID, int entityID, int componentID, uint value)
 	{
 		this.worldID = worldID;
 		this.entityID = entityID;
 		this.componentID = componentID;
 		Value = value;
 		
-		SendIntComponent(worldID, entityID, componentID, Value);
+		SendUIntComponent(worldID, entityID, componentID, Value);
 	}
 	
-	private void SendIntComponent(int worldId, int entityId, int componentId, int value)
+	private void SendUIntComponent(int worldId, int entityId, int componentId, uint value)
 	{
-		IntComponentMessage msg = new IntComponentMessage
+		UIntComponentMessage msg = new UIntComponentMessage
 		{
 			worldID = worldId,
 			entityID = entityId,

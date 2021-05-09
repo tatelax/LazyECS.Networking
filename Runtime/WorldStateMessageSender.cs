@@ -168,6 +168,9 @@ public class WorldStateMessageSender
 			case "String":
 				new StringComponentMessage(worldId, entityId, ComponentLookup.Get(networkComponent.GetType()),(string)networkComponent.Get());
 				break;
+			case "UInt32":
+				new UIntComponentMessage(worldId, entityId, ComponentLookup.Get(networkComponent.GetType()),(uint)networkComponent.Get());
+				break;
 			case "Int32":
 				new IntComponentMessage(worldId, entityId, ComponentLookup.Get(networkComponent.GetType()),(int)networkComponent.Get());
 				break;

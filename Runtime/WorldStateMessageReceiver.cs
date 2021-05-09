@@ -29,6 +29,9 @@ public static class WorldStateMessageReceiver
 		NetworkClient.RegisterHandler<FloatComponentMessage>(FloatComponentMessageReceived);
 		NetworkServer.RegisterHandler<FloatComponentMessage>(FloatComponentMessageReceived);
 		
+		NetworkClient.RegisterHandler<UIntComponentMessage>(UIntComponentMessageReceived);
+		NetworkServer.RegisterHandler<UIntComponentMessage>(UIntComponentMessageReceived);
+		
 		NetworkClient.RegisterHandler<IntComponentMessage>(IntComponentMessageReceived);
 		NetworkServer.RegisterHandler<IntComponentMessage>(IntComponentMessageReceived);
 		
@@ -142,6 +145,11 @@ public static class WorldStateMessageReceiver
 	}
 
 	private static void BoolComponentMessageReceived(NetworkConnection conn, BoolComponentMessage msg)
+	{
+		SetComponentFromNetworkMessage(conn.connectionId, msg.worldID, msg.entityID, msg.componentID, msg.Value);
+	}
+	
+	private static void UIntComponentMessageReceived(NetworkConnection conn, UIntComponentMessage msg)
 	{
 		SetComponentFromNetworkMessage(conn.connectionId, msg.worldID, msg.entityID, msg.componentID, msg.Value);
 	}
