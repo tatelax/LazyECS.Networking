@@ -41,43 +41,20 @@ public class MainWorld : NetworkWorld
 
 ### Step 2
 
-Change the base class of the components you wish to sync from **IComponent** to **INetworkComponent** and implement the missing interface members.
+Change the base class of the components you wish to sync from **IComponent** to **INetworkComponent**.
 
 ```csharp
-using Mirror;
-using UnityEngine;
-
-public class PositionComponent : INetworkComponent
+public class PlayerNameComponent : INetworkComponent
 {
-    public PositionComponent()
-    {
-        NetworkClient.RegisterHandler<PositionComponentMessage>(OnMessageRecieve);
-    }
-    
-    public Vector3 Value { get; private set; }
+	public string Value { get; private set; }
 
-    public void OnMessageRecieve(NetworkConnection conn, PositionComponentMessage msg)
-    {
-        Debug.Log($"New pos recieved! {msg.Value}");
-        Value = msg.Value;
-    }
+	public bool Set(object value)
+	{
+		Value = (string) value;
+		return true;
+	}
 
-    public void Set(object value) => Value = (Vector3)value;
-    
-    public void SendMessage(bool toClients)
-    {
-        PositionComponentMessage msg = new PositionComponentMessage {Value = Value};
-        
-        if(toClients)
-            NetworkServer.SendToAll(msg);
-        else
-            NetworkClient.Send(msg);
-    }
-
-    public struct PositionComponentMessage : NetworkMessage
-    {
-        public Vector3 Value;
-    }
+	public object Get() => Value;
 }
 ```
 
