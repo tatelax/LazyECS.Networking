@@ -40,6 +40,9 @@ public static class WorldStateMessageReceiver
 		
 		NetworkClient.RegisterHandler<Vector3ComponentMessage>(Vector3ComponentMessageReceived);
 		NetworkServer.RegisterHandler<Vector3ComponentMessage>(Vector3ComponentMessageReceived);
+		
+		NetworkClient.RegisterHandler<StringArrayComponentMessage>(StringArrayComponentMessageReceived);
+		NetworkServer.RegisterHandler<StringArrayComponentMessage>(StringArrayComponentMessageReceived);
 	}
 
 	
@@ -160,6 +163,11 @@ public static class WorldStateMessageReceiver
 	}
 
 	private static void FloatComponentMessageReceived(NetworkConnection conn, FloatComponentMessage msg)
+	{
+		SetComponentFromNetworkMessage(conn.connectionId, msg.worldID, msg.entityID, msg.componentID, msg.Value);
+	}
+	
+	private static void StringArrayComponentMessageReceived(NetworkConnection conn, StringArrayComponentMessage msg)
 	{
 		SetComponentFromNetworkMessage(conn.connectionId, msg.worldID, msg.entityID, msg.componentID, msg.Value);
 	}

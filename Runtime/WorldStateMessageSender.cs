@@ -183,6 +183,9 @@ public class WorldStateMessageSender
 			case "Vector3":
 				new Vector3ComponentMessage(worldId, entityId, ComponentLookup.Get(networkComponent.GetType()),(Vector3)networkComponent.Get());
 				break;
+			case "String[]":
+				new StringArrayComponentMessage(worldId, entityId, ComponentLookup.Get(networkComponent.GetType()), (string[])networkComponent.Get());
+				break;
 			default:
 				Debug.LogError($"Unable to send message. Unknown type: {networkComponent.Get().GetType().Name}");
 				break;
