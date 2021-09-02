@@ -1,4 +1,5 @@
-﻿using Mirror;
+﻿using System;
+using Mirror;
 using UnityEngine;
 
 public class LazyNetworkManager : NetworkManager
@@ -8,6 +9,8 @@ public class LazyNetworkManager : NetworkManager
     public delegate void ServerConnect(NetworkConnection connection);
     public delegate void ClientConnect(NetworkConnection connection);
     public delegate void ClientDisconnect(NetworkConnection connection);
+    public delegate void ClientError(Exception exception);
+    public delegate void StartClient();
     public delegate void StopClient();
     public delegate void ServerDisconnect(NetworkConnection connection);
     public delegate void ServerStart();
@@ -17,6 +20,8 @@ public class LazyNetworkManager : NetworkManager
     public event ServerConnect OnServerConnectedEvent; //A player joined
     public event ClientConnect OnClientConnectedEvent; //Client joined the server
     public event ClientDisconnect OnClientDisconnectEvent; // Client disconnected from server
+    public event ClientError OnClientErrorEvent;
+    public event StartClient OnStartClientEvent;
     public event StopClient OnStopClientEvent; // The client stopped
     public event ServerDisconnect OnServerDisconnectEvent; // Client disconnected from server
     public event ServerStart OnServerStartEvent; // Server started
@@ -63,24 +68,33 @@ public class LazyNetworkManager : NetworkManager
         OnClientConnectedEvent?.Invoke(conn);
     }
 
+    public override void OnStartClient()
+    {
+        base.OnStartClient();
+        OnStartClientEvent?.Invoke();
+    }
+    
     public override void OnStopClient()
     {
         base.OnStopClient();
-        
         OnStopClientEvent?.Invoke();
     }
 
     public override void OnClientDisconnect(NetworkConnection conn)
     {
         base.OnClientDisconnect(conn);
-        
         OnClientDisconnectEvent?.Invoke(conn);
+    }
+
+    public override void OnClientError(Exception exception)
+    {
+        base.OnClientError(exception);
+        OnClientErrorEvent?.Invoke(exception);
     }
 
     public override void OnServerDisconnect(NetworkConnection conn)
     {
         base.OnServerDisconnect(conn);
-        
         OnServerDisconnectEvent?.Invoke(conn);
     }
 
@@ -105,7 +119,6 @@ public class LazyNetworkManager : NetworkManager
     public override void OnServerReady(NetworkConnection conn)
     {
         base.OnServerReady(conn);
-        
         OnServerReadyEvent?.Invoke(conn);
     }
 }
