@@ -30,16 +30,10 @@ public class LazyNetworkManager : NetworkManager
         
     private WorldStateMessageSender worldStateMessageSender;
     
-    public override void Awake()
-    {
-        base.Awake();
-
-        WorldStateMessageReceiver.RegisterHandlers();
-    }
-    
     public override void OnStartServer()
     {
         base.OnStartServer();
+        WorldStateMessageReceiver.RegisterServerHandlers();
         simulationController.gameObject.SetActive(true);
         worldStateMessageSender = new WorldStateMessageSender();
         
@@ -71,6 +65,7 @@ public class LazyNetworkManager : NetworkManager
     public override void OnStartClient()
     {
         base.OnStartClient();
+        WorldStateMessageReceiver.RegisterClientHandlers();
         OnStartClientEvent?.Invoke();
     }
     

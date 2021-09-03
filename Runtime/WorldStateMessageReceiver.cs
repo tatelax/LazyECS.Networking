@@ -8,40 +8,35 @@ using UnityEngine;
 #pragma warning disable CS0618
 public static class WorldStateMessageReceiver
 {
-	public static void RegisterHandlers()
+	public static void RegisterClientHandlers()
 	{
 		NetworkClient.RegisterHandler<CreateEntityMessage>(CreateEntityMessageReceived);
-		NetworkServer.RegisterHandler<CreateEntityMessage>(CreateEntityMessageReceived);
-
 		NetworkClient.RegisterHandler<DestroyEntityMessage>(DestroyEntityMessageReceived);
-		NetworkServer.RegisterHandler<DestroyEntityMessage>(DestroyEntityMessageReceived);
-
 		NetworkClient.RegisterHandler<ComponentAddedMessage>(ComponentAddedMessageReceived);
-		NetworkServer.RegisterHandler<ComponentAddedMessage>(ComponentAddedMessageReceived);
-
 		NetworkClient.RegisterHandler<ComponentRemovedMessage>(ComponentRemovedMessageReceived);
-		NetworkServer.RegisterHandler<ComponentRemovedMessage>(ComponentRemovedMessageReceived);
-		
 		
 		NetworkClient.RegisterHandler<StringComponentMessage>(StringComponentMessageReceived);
-		NetworkServer.RegisterHandler<StringComponentMessage>(StringComponentMessageReceived);
-		
 		NetworkClient.RegisterHandler<FloatComponentMessage>(FloatComponentMessageReceived);
-		NetworkServer.RegisterHandler<FloatComponentMessage>(FloatComponentMessageReceived);
-		
 		NetworkClient.RegisterHandler<UIntComponentMessage>(UIntComponentMessageReceived);
-		NetworkServer.RegisterHandler<UIntComponentMessage>(UIntComponentMessageReceived);
-		
 		NetworkClient.RegisterHandler<IntComponentMessage>(IntComponentMessageReceived);
-		NetworkServer.RegisterHandler<IntComponentMessage>(IntComponentMessageReceived);
-		
 		NetworkClient.RegisterHandler<BoolComponentMessage>(BoolComponentMessageReceived);
-		NetworkServer.RegisterHandler<BoolComponentMessage>(BoolComponentMessageReceived);
-		
 		NetworkClient.RegisterHandler<Vector3ComponentMessage>(Vector3ComponentMessageReceived);
-		NetworkServer.RegisterHandler<Vector3ComponentMessage>(Vector3ComponentMessageReceived);
-		
 		NetworkClient.RegisterHandler<StringArrayComponentMessage>(StringArrayComponentMessageReceived);
+	}
+
+	public static void RegisterServerHandlers()
+	{
+		NetworkServer.RegisterHandler<CreateEntityMessage>(CreateEntityMessageReceived);
+		NetworkServer.RegisterHandler<DestroyEntityMessage>(DestroyEntityMessageReceived);
+		NetworkServer.RegisterHandler<ComponentAddedMessage>(ComponentAddedMessageReceived);
+		NetworkServer.RegisterHandler<ComponentRemovedMessage>(ComponentRemovedMessageReceived);
+		
+		NetworkServer.RegisterHandler<StringComponentMessage>(StringComponentMessageReceived);
+		NetworkServer.RegisterHandler<FloatComponentMessage>(FloatComponentMessageReceived);
+		NetworkServer.RegisterHandler<UIntComponentMessage>(UIntComponentMessageReceived);
+		NetworkServer.RegisterHandler<IntComponentMessage>(IntComponentMessageReceived);
+		NetworkServer.RegisterHandler<BoolComponentMessage>(BoolComponentMessageReceived);
+		NetworkServer.RegisterHandler<Vector3ComponentMessage>(Vector3ComponentMessageReceived);
 		NetworkServer.RegisterHandler<StringArrayComponentMessage>(StringArrayComponentMessageReceived);
 	}
 
