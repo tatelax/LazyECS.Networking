@@ -5,29 +5,18 @@ using UnityEngine;
 public class LazyNetworkManager : NetworkManager
 {
     [SerializeField] private SimulationController simulationController;
+
+    public Action<NetworkConnection> OnServerConnectedEvent;     // A client connected to us (the server)
+    public Action<NetworkConnection> OnClientConnectedEvent;     // Client joined the server
+    public Action<NetworkConnection> OnClientDisconnectEvent;    // Client disconnected from server
+    public Action<Exception> OnClientErrorEvent;                 // Client experienced an exception
+    public Action OnStartClientEvent;                            // Client started (doesnt mean connected)
+    public Action OnStopClientEvent;                             // The client stopped
+    public Action<NetworkConnection> OnServerDisconnectEvent;    // Client disconnected from server
+    public Action OnServerStartEvent;                            // Server started
+    public Action OnServerStopEvent;                             // Server stopped
+    public Action<NetworkConnection> OnServerReadyEvent;         // A client sent the ready message to the server
     
-    public delegate void ServerConnect(NetworkConnection connection);
-    public delegate void ClientConnect(NetworkConnection connection);
-    public delegate void ClientDisconnect(NetworkConnection connection);
-    public delegate void ClientError(Exception exception);
-    public delegate void StartClient();
-    public delegate void StopClient();
-    public delegate void ServerDisconnect(NetworkConnection connection);
-    public delegate void ServerStart();
-    public delegate void ServerStop();
-    public delegate void ServerReady(NetworkConnection connection);
-    
-    public event ServerConnect OnServerConnectedEvent; //A player joined
-    public event ClientConnect OnClientConnectedEvent; //Client joined the server
-    public event ClientDisconnect OnClientDisconnectEvent; // Client disconnected from server
-    public event ClientError OnClientErrorEvent;
-    public event StartClient OnStartClientEvent;
-    public event StopClient OnStopClientEvent; // The client stopped
-    public event ServerDisconnect OnServerDisconnectEvent; // Client disconnected from server
-    public event ServerStart OnServerStartEvent; // Server started
-    public event ServerStop OnServerStopEvent; // Server stopped
-    public event ServerReady OnServerReadyEvent; // A client sent the ready message to the server
-        
     private WorldStateMessageSender worldStateMessageSender;
     
     public override void OnStartServer()
